@@ -772,7 +772,7 @@ function sendChat(){
     var rem=FREE_CHAT_LIMIT-chatCount;
     document.getElementById('advisor-limit-msg').textContent=rem>0?rem+' free question'+(rem!==1?'s':'')+' remaining':'Free questions used — get the book for unlimited access';
   }
-  fetch('https://api.anthropic.com/v1/messages',{
+  fetch('https://learnscotch-advisor.dan-01d.workers.dev',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
