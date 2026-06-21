@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LearnScotch — Your Whisky Journey</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+  /* ── Reset & base ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f9f7f4; color: #1a1a1a; min-height: 100vh; }
+
+  /* ── Layout ── */
+  .app-shell { max-width: 760px; margin: 0 auto; padding: 0 16px 60px; }
+
+  /* ── Header ── */
+  .app-header { padding: 28px 0 20px; border-bottom: 1px solid #e8e2d9; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; }
+  .app-logo { font-size: 20px; font-weight: 600; color: #1a1a1a; letter-spacing: -0.3px; }
+  .app-logo span { color: #8B5E3C; }
+  .app-tagline { font-size: 13px; color: #888; }
+  .tier-badge { font-size: 11px; padding: 4px 10px; border-radius: 20px; font-weight: 500; background: #f0e8df; color: #6b3d1e; border: 1px solid #ddd0c4; }
+
+  /* ── Nav ── */
+  .nav-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 24px; }
+  .nav { display: flex; gap: 2px; border-bottom: 1px solid #e8e2d9; min-width: max-content; }
+  .nb { background: none; border: none; padding: 10px 14px; font-size: 13px; color: #888; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; font-family: inherit; transition: color 0.15s; }
+  .nb:hover { color: #1a1a1a; }
+  .nb.active { color: #1a1a1a; border-bottom-color: #8B5E3C; font-weight: 500; }
+  .nb.locked { color: #ccc; cursor: default; }
+  .nb .lock-icon { font-size: 10px; margin-left: 3px; }
+
+  /* ── Sections ── */
+  .sec { display: none; } .sec.active { display: block; }
+
+  /* ── Cards ── */
+  .card { background: #fff; border: 1px solid #e8e2d9; border-radius: 12px; padding: 18px 20px; margin-bottom: 14px; }
+  .card-sm { background: #f9f7f4; border-radius: 8px; padding: 13px 16px; margin-bottom: 10px; }
+
+  /* ── Typography ── */
+  h2 { font-size: 19px; font-weight: 600; margin-bottom: 5px; color: #1a1a1a; }
+  h3 { font-size: 15px; font-weight: 600; margin-bottom: 7px; color: #1a1a1a; }
+  p { font-size: 14px; color: #555; line-height: 1.65; }
+  a { color: #8B5E3C; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── Badges ── */
+  .badge { display: inline-block; font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 500; margin-bottom: 9px; }
+  .b-amber { background: #fef3e2; color: #7a4f1a; }
+  .b-teal  { background: #e3f6ef; color: #1a6b4a; }
+  .b-blue  { background: #e8f1fb; color: #1a4a8b; }
+  .b-coral { background: #fdeee8; color: #7a2e1a; }
+  .b-purple{ background: #f0eeff; color: #3d2a8b; }
+  .b-green { background: #edf7e3; color: #2a6b1a; }
+  .b-gray  { background: #f1efea; color: #4a4540; }
+
+  /* ── Progress ── */
+  .pbar { height: 5px; background: #f0ebe4; border-radius: 3px; margin: 10px 0 16px; }
+  .pfill { height: 5px; background: #8B5E3C; border-radius: 3px; transition: width 0.4s; }
+
+  /* ── Step items ── */
+  .snum { width: 30px; height: 30px; border-radius: 50%; background: #f9f7f4; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #888; flex-shrink: 0; margin-top: 2px; }
+  .snum.done { background: #e3f6ef; color: #1a6b4a; border-color: #a8dfc4; }
+
+  /* ── Region grid ── */
+  .rgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+  @media(max-width:420px){ .rgrid { grid-template-columns: 1fr; } }
+  .rcard { border: 1px solid #e8e2d9; border-radius: 10px; padding: 14px; cursor: pointer; background: #fff; transition: border-color 0.15s, background 0.15s; }
+  .rcard:hover { border-color: #c4a882; background: #fdf9f5; }
+  .rcard.sel { border: 2px solid #8B5E3C; background: #fdf5ee; }
+  .region-detail { background: #f9f7f4; border-radius: 10px; padding: 16px; margin-top: 12px; }
+
+  /* ── Flavor grid ── */
+  .fgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 12px 0; }
+  @media(max-width:400px){ .fgrid { grid-template-columns: 1fr 1fr; } }
+  .fbtn { border: 1px solid #e8e2d9; border-radius: 8px; padding: 11px 8px; font-size: 12px; cursor: pointer; background: #fff; color: #555; text-align: center; font-family: inherit; transition: all 0.15s; }
+  .fbtn:hover { background: #f9f7f4; border-color: #c4a882; }
+  .fbtn.sel { border-color: #8B5E3C; background: #fdf5ee; color: #6b3d1e; font-weight: 500; }
+
+  /* ── Recommendation cards ── */
+  .rcrd { border: 1px solid #e8e2d9; border-radius: 10px; padding: 14px; margin-bottom: 8px; background: #fff; }
+
+  /* ── Form elements ── */
+  input[type=text], input[type=email], textarea, select {
+    width: 100%; padding: 9px 12px; font-size: 13px;
+    border: 1px solid #ddd; border-radius: 8px; margin-bottom: 10px;
+    background: #fff; color: #1a1a1a; font-family: inherit;
+    transition: border-color 0.15s;
+  }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: #8B5E3C; }
+  textarea { height: 78px; resize: vertical; }
+
+  /* ── Sliders ── */
+  .slr { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+  .slr label { font-size: 12px; color: #888; width: 75px; flex-shrink: 0; }
+  .slr input[type=range] { flex: 1; accent-color: #8B5E3C; cursor: pointer; margin: 0; }
+  .slr span { font-size: 12px; font-weight: 600; width: 18px; text-align: right; color: #1a1a1a; }
+
+  /* ── Buttons ── */
+  .btn { background: #8B5E3C; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-size: 13px; cursor: pointer; font-family: inherit; font-weight: 500; transition: background 0.15s; }
+  .btn:hover { background: #7a5233; }
+  .btn2 { background: none; border: 1px solid #ddd; padding: 9px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; color: #1a1a1a; font-family: inherit; transition: all 0.15s; }
+  .btn2:hover { background: #f9f7f4; border-color: #c4a882; }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+
+  /* ── Two-col ── */
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media(max-width:420px){ .two { grid-template-columns: 1fr; } }
+
+  /* ── Journal ── */
+  .ne { border-bottom: 1px solid #f0ebe4; padding: 12px 0; }
+  .ne:last-child { border-bottom: none; }
+  .stars { color: #c4891f; font-size: 14px; letter-spacing: 1px; }
+  .tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 20px; background: #f9f7f4; color: #888; margin: 2px; border: 1px solid #e8e2d9; }
+
+  /* ── Stats ── */
+  .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+  .stat { background: #f9f7f4; border-radius: 8px; padding: 13px; text-align: center; border: 1px solid #e8e2d9; }
+  .stat-n { font-size: 22px; font-weight: 600; color: #1a1a1a; }
+  .stat-l { font-size: 11px; color: #888; margin-top: 2px; }
+
+  /* ── Quiz ── */
+  .qopt { width: 100%; text-align: left; border: 1px solid #e8e2d9; border-radius: 8px; padding: 12px 15px; font-size: 13px; cursor: pointer; background: #fff; color: #1a1a1a; font-family: inherit; margin-bottom: 8px; transition: all 0.15s; }
+  .qopt:hover { background: #f9f7f4; border-color: #c4a882; }
+  .qopt.correct { background: #e3f6ef; border-color: #a8dfc4; color: #1a6b4a; }
+  .qopt.wrong { background: #fdeee8; border-color: #f0b49a; color: #7a2e1a; }
+  .quiz-score-big { font-size: 48px; font-weight: 700; color: #8B5E3C; text-align: center; margin: 10px 0 4px; }
+  .quiz-score-sub { font-size: 15px; color: #888; text-align: center; margin-bottom: 16px; }
+
+  /* ── AI chat ── */
+  .chat-wrap { min-height: 180px; margin-bottom: 12px; }
+  .chat-msg { margin-bottom: 10px; }
+  .chat-user { text-align: right; }
+  .bubble { display: inline-block; padding: 9px 13px; border-radius: 10px; font-size: 13px; max-width: 86%; line-height: 1.55; }
+  .bubble.u { background: #fdf0e6; color: #6b3d1e; border: 1px solid #e8d5c0; }
+  .bubble.a { background: #f9f7f4; color: #1a1a1a; border: 1px solid #e8e2d9; text-align: left; }
+  .chat-input-row { display: flex; gap: 8px; }
+  .chat-input-row input { flex: 1; margin: 0; }
+  .quick-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .qbtn { font-size: 12px; padding: 6px 11px; border: 1px solid #ddd; border-radius: 20px; background: #fff; cursor: pointer; color: #555; font-family: inherit; transition: all 0.15s; }
+  .qbtn:hover { border-color: #8B5E3C; color: #8B5E3C; }
+
+  /* ── Glossary ── */
+  .gterm { border-bottom: 1px solid #f0ebe4; padding: 12px 0; }
+  .gterm:last-child { border-bottom: none; }
+  .cat-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .cpill { font-size: 11px; padding: 5px 12px; border-radius: 20px; border: 1px solid #ddd; background: #fff; cursor: pointer; color: #555; font-family: inherit; transition: all 0.15s; }
+  .cpill:hover { border-color: #8B5E3C; }
+  .cpill.active { background: #8B5E3C; color: #fff; border-color: #8B5E3C; }
+
+  /* ── Gate overlay ── */
+  .gate { background: #fff; border: 1px solid #e8e2d9; border-radius: 12px; padding: 32px 24px; text-align: center; margin-top: 8px; }
+  .gate h3 { font-size: 17px; margin-bottom: 8px; }
+  .gate p { max-width: 340px; margin: 0 auto 18px; font-size: 14px; }
+  .gate input { max-width: 300px; margin: 0 auto 10px; }
+
+  /* ── Upsell strip ── */
+  .upsell-strip { background: #fdf5ee; border: 1px solid #e8d5c0; border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .upsell-strip p { font-size: 13px; color: #6b3d1e; margin: 0; flex: 1; }
+  .upsell-strip a.btn { font-size: 12px; padding: 7px 14px; white-space: nowrap; }
+
+  /* ── Empty state ── */
+  .empty { text-align: center; padding: 2.5rem 1rem; color: #aaa; font-size: 14px; }
+  .empty i { font-size: 36px; display: block; margin-bottom: 10px; }
+
+  /* ── Footer ── */
+  .app-footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #e8e2d9; text-align: center; font-size: 12px; color: #aaa; }
+  .app-footer a { color: #8B5E3C; }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- Header -->
+  <header class="app-header">
+    <div>
+      <div class="app-logo">Learn<span>Scotch</span></div>
+      <div class="app-tagline">The beginner's guide to whisky</div>
+    </div>
+    <div id="tier-display" class="tier-badge">Free preview</div>
+  </header>
+
+  <!-- Nav -->
+  <div class="nav-wrap">
+    <nav class="nav" id="main-nav">
+      <button class="nb active" onclick="showTab('learn',this)"><i class="ti ti-book-2"></i> Learn</button>
+      <button class="nb" onclick="showTab('regions',this)"><i class="ti ti-map-2"></i> Regions</button>
+      <button class="nb" onclick="showTab('flavors',this)"><i class="ti ti-ripple"></i> Flavor finder</button>
+      <button class="nb" id="nav-journal" onclick="gatedTab('journal',this)"><i class="ti ti-notebook"></i> Journal <span class="lock-icon" id="lock-journal">🔒</span></button>
+      <button class="nb" id="nav-quiz" onclick="gatedTab('quiz',this)"><i class="ti ti-question-mark"></i> Quiz <span class="lock-icon" id="lock-quiz">🔒</span></button>
+      <button class="nb" id="nav-advisor" onclick="gatedTab('advisor',this)"><i class="ti ti-message-circle"></i> AI advisor <span class="lock-icon" id="lock-advisor">🔒</span></button>
+      <button class="nb" id="nav-glossary" onclick="gatedTab('glossary',this)"><i class="ti ti-a-b"></i> Glossary <span class="lock-icon" id="lock-glossary">🔒</span></button>
+    </nav>
+  </div>
+
+  <!-- LEARN -->
+  <div id="tab-learn" class="sec active">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <span class="badge b-teal">Your progress</span>
+        <span id="prog-label" style="font-size:12px;color:#888">0 of 6 complete</span>
+      </div>
+      <div class="pbar"><div class="pfill" id="pfill" style="width:0%"></div></div>
+      <p style="font-size:13px">Work through these six foundations and you'll know more than most people in any whisky bar.</p>
+    </div>
+    <div id="steps-list"></div>
+    <!-- Lesson 1 is free; rest show upsell after first open if not unlocked -->
+  </div>
+
+  <!-- REGIONS -->
+  <div id="tab-regions" class="sec">
+    <div class="card-sm" style="margin-bottom:14px"><p>Scotland's five regions each produce a distinct style. Tap any to explore.</p></div>
+    <div class="rgrid" id="region-grid"></div>
+    <div id="region-detail" class="region-detail" style="display:none"></div>
+    <div class="card" style="margin-top:18px">
+      <span class="badge b-amber">Beyond Scotland</span>
+      <h3>Other whisky traditions</h3>
+      <div style="margin-top:10px">
+        <div class="card-sm"><div style="font-size:13px;font-weight:600;margin-bottom:4px">🇮🇪 Irish whiskey</div><p>Triple-distilled for smoothness. No peat. Lighter and approachable. Key names: Jameson, Redbreast, Green Spot, Teeling.</p></div>
+        <div class="card-sm"><div style="font-size:13px;font-weight:600;margin-bottom:4px">🇺🇸 Bourbon</div><p>American whiskey, at least 51% corn, aged in new charred oak. Sweet, vanilla-forward. Key names: Buffalo Trace, Maker's Mark, Wild Turkey, Four Roses.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLAVORS -->
+  <div id="tab-flavors" class="sec">
+    <div class="card-sm" style="margin-bottom:14px"><p>Pick the flavors that appeal to you and we'll suggest where to start.</p></div>
+    <p style="font-size:13px;color:#888;margin-bottom:8px">What sounds good to you?</p>
+    <div class="fgrid" id="flavor-grid"></div>
+    <button class="btn" onclick="showRecos()">Find my whiskies →</button>
+    <div id="reco-results" style="margin-top:18px"></div>
+
+    <!-- Email gate for full recommendations -->
+    <div id="flavor-gate" style="display:none">
+      <div class="gate">
+        <span class="badge b-amber">Almost there</span>
+        <h3>Get your personalized picks</h3>
+        <p>Enter your email and we'll send your recommendations — plus our free beginner's guide to Scotch.</p>
+        <input type="email" id="gate-email" placeholder="your@email.com">
+        <div class="btn-row" style="justify-content:center">
+          <button class="btn" onclick="submitGateEmail()">Send my picks →</button>
+        </div>
+        <p style="font-size:12px;margin-top:10px;color:#aaa">No spam. Unsubscribe any time.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- JOURNAL (gated) -->
+  <div id="tab-journal" class="sec">
+    <div id="journal-stats" style="display:none;margin-bottom:14px"></div>
+    <div class="card">
+      <h3>Log a tasting</h3>
+      <div style="margin-top:13px">
+        <div class="two">
+          <input type="text" id="j-name" placeholder="Whisky name">
+          <input type="text" id="j-distillery" placeholder="Distillery (optional)">
+        </div>
+        <select id="j-type">
+          <option value="">Style...</option>
+          <option>Scotch — Speyside</option><option>Scotch — Highlands</option>
+          <option>Scotch — Islay</option><option>Scotch — Lowlands</option>
+          <option>Scotch — Campbeltown</option><option>Scotch — blended</option>
+          <option>Irish whiskey</option><option>Bourbon</option>
+          <option>Rye whiskey</option><option>Japanese whisky</option><option>Other</option>
+        </select>
+        <div style="margin-bottom:12px">
+          <div style="font-size:12px;color:#888;margin-bottom:8px">Flavor profile (0–10)</div>
+          <div class="slr"><label>Peat / smoke</label><input type="range" min="0" max="10" value="0" id="s-peat" step="1" oninput="document.getElementById('v-peat').textContent=this.value"><span id="v-peat">0</span></div>
+          <div class="slr"><label>Sweetness</label><input type="range" min="0" max="10" value="5" id="s-sweet" step="1" oninput="document.getElementById('v-sweet').textContent=this.value"><span id="v-sweet">5</span></div>
+          <div class="slr"><label>Fruit</label><input type="range" min="0" max="10" value="5" id="s-fruit" step="1" oninput="document.getElementById('v-fruit').textContent=this.value"><span id="v-fruit">5</span></div>
+          <div class="slr"><label>Spice</label><input type="range" min="0" max="10" value="3" id="s-spice" step="1" oninput="document.getElementById('v-spice').textContent=this.value"><span id="v-spice">3</span></div>
+          <div class="slr"><label>Oak / wood</label><input type="range" min="0" max="10" value="3" id="s-oak" step="1" oninput="document.getElementById('v-oak').textContent=this.value"><span id="v-oak">3</span></div>
+        </div>
+        <div style="margin-bottom:12px">
+          <div style="font-size:12px;color:#888;margin-bottom:7px">Overall rating</div>
+          <div style="display:flex;gap:6px" id="star-row">
+            <button class="btn2" id="r1" onclick="setRating(1)">★</button>
+            <button class="btn2" id="r2" onclick="setRating(2)">★★</button>
+            <button class="btn2" id="r3" onclick="setRating(3)">★★★</button>
+            <button class="btn2" id="r4" onclick="setRating(4)">★★★★</button>
+            <button class="btn2" id="r5" onclick="setRating(5)">★★★★★</button>
+          </div>
+        </div>
+        <textarea id="j-notes" placeholder="Your impressions — nose, palate, finish. No wrong answers."></textarea>
+        <div class="btn-row">
+          <button class="btn" onclick="saveEntry()">Save tasting note</button>
+          <button class="btn2" onclick="exportJournal()"><i class="ti ti-download"></i> Export notes</button>
+        </div>
+      </div>
+    </div>
+    <div id="journal-list" style="margin-top:10px"></div>
+  </div>
+
+  <!-- QUIZ (gated) -->
+  <div id="tab-quiz" class="sec">
+    <div id="quiz-home">
+      <div class="card">
+        <span class="badge b-purple">Test your knowledge</span>
+        <h3>Whisky quiz</h3>
+        <p style="margin-bottom:16px">15 questions across Scotch, Irish whiskey, and bourbon. See how you score.</p>
+        <div class="btn-row">
+          <button class="btn" onclick="startQuiz('all')">All styles</button>
+          <button class="btn2" onclick="startQuiz('scotch')">Scotch only</button>
+          <button class="btn2" onclick="startQuiz('bourbon')">Bourbon & Irish</button>
+        </div>
+      </div>
+      <div id="quiz-history"></div>
+    </div>
+    <div id="quiz-active" style="display:none"></div>
+  </div>
+
+  <!-- AI ADVISOR (gated) -->
+  <div id="tab-advisor" class="sec">
+    <div class="upsell-strip" id="advisor-upsell" style="display:none">
+      <p>Unlock unlimited AI recommendations — get the book.</p>
+      <a href="/products/becoming-a-scotch-connoisseur" class="btn">Get the book →</a>
+    </div>
+    <div class="card" style="margin-bottom:12px">
+      <span class="badge b-purple">AI-powered</span>
+      <h3>What should I try next?</h3>
+      <p style="font-size:13px">Tell me what you've enjoyed, your budget, or the occasion — and I'll give you a personalised recommendation.</p>
+    </div>
+    <div class="card-sm" style="margin-bottom:10px">
+      <p style="font-size:12px;color:#888;margin-bottom:8px">Quick starters</p>
+      <div class="quick-btns">
+        <button class="qbtn" onclick="prefill('I\'m completely new to Scotch — where do I start?')">New to Scotch</button>
+        <button class="qbtn" onclick="prefill('I love bourbon. What Scotch would I enjoy?')">Bourbon to Scotch</button>
+        <button class="qbtn" onclick="prefill('What\'s a great Scotch under $50?')">Under $50</button>
+        <button class="qbtn" onclick="prefill('I tried Laphroaig and loved it — what next?')">Love peat</button>
+        <button class="qbtn" onclick="prefill('I hate smoke. What whisky should I try?')">Avoid smoke</button>
+        <button class="qbtn" onclick="prefill('What\'s a good whisky to give as a gift?')">Gift ideas</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="chat-wrap" id="chat-msgs">
+        <div class="chat-msg"><div class="bubble a">Hi! I'm your LearnScotch whisky advisor. Ask me anything — bottle recommendations, style comparisons, what to try next. No question is too basic.</div></div>
+      </div>
+      <div class="chat-input-row">
+        <input type="text" id="chat-in" placeholder="Ask me anything about whisky..." onkeydown="if(event.key==='Enter')sendChat()" style="margin:0">
+        <button class="btn" onclick="sendChat()"><i class="ti ti-send"></i></button>
+      </div>
+      <div id="advisor-limit-msg" style="font-size:12px;color:#aaa;margin-top:8px;text-align:right"></div>
+    </div>
+  </div>
+
+  <!-- GLOSSARY (gated) -->
+  <div id="tab-glossary" class="sec">
+    <div class="card-sm" style="margin-bottom:14px">
+      <input type="text" id="gloss-search" placeholder="Search terms..." oninput="filterGloss()" style="margin:0">
+    </div>
+    <div class="cat-pills" id="gloss-cats"></div>
+    <div class="card" id="gloss-list"></div>
+  </div>
+
+  <footer class="app-footer">
+    <p>Built by <a href="https://learnscotch.com">LearnScotch.com</a> · Based on <em>Becoming a Scotch Connoisseur</em> by Dan</p>
+    <p style="margin-top:6px"><a href="/products/becoming-a-scotch-connoisseur">Get the book →</a> · <a href="/pages/about">About</a></p>
+  </footer>
+
+</div><!-- /app-shell -->
+
+<script>
+/* ── ACCESS TIERS ────────────────────────────────────────────────
+   INTEGRATION NOTE: Replace this logic with your real unlock check.
+   Options:
+   A) Shopify customer tag: check via /account.json or a custom endpoint
+   B) URL param:  ?access=PURCHASECODE  (simple, set in post-purchase email)
+   C) Klaviyo property: check via your backend
+   D) localStorage flag set by your post-purchase redirect
+──────────────────────────────────────────────────────────────── */
+var TIER = 'free'; // 'free' | 'book' | 'premium'
+
+function detectTier() {
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('access') === 'BOOK2024') TIER = 'book';
+  if (params.get('access') === 'PREMIUM2024') TIER = 'premium';
+  // Also check localStorage for returning visitors
+  var stored = localStorage.getItem('ls_tier');
+  if (stored === 'book' || stored === 'premium') TIER = stored;
+  if (TIER !== 'free') localStorage.setItem('ls_tier', TIER);
+  applyTier();
+}
+
+function applyTier() {
+  var tierBadge = document.getElementById('tier-display');
+  // Book tier: unlock journal, quiz, glossary
+  var bookTabs = ['journal','quiz','glossary'];
+  // Premium tier: also unlock advisor
+  var premiumTabs = ['advisor'];
+
+  if (TIER === 'free') {
+    tierBadge.textContent = 'Free preview';
+  } else if (TIER === 'book') {
+    tierBadge.textContent = '📖 Book owner';
+    tierBadge.style.background = '#e3f6ef';
+    tierBadge.style.color = '#1a6b4a';
+    tierBadge.style.borderColor = '#a8dfc4';
+    bookTabs.forEach(unlockTab);
+  } else if (TIER === 'premium') {
+    tierBadge.textContent = '⭐ Premium';
+    tierBadge.style.background = '#fdf0e6';
+    tierBadge.style.color = '#6b3d1e';
+    tierBadge.style.borderColor = '#e8c4a0';
+    bookTabs.concat(premiumTabs).forEach(unlockTab);
+  }
+}
+
+function unlockTab(name) {
+  var lock = document.getElementById('lock-' + name);
+  if (lock) lock.style.display = 'none';
+}
+
+function gatedTab(name, el) {
+  var locked = {'journal':TIER==='free','quiz':TIER==='free','glossary':TIER==='free','advisor':TIER!=='premium'};
+  if (locked[name]) {
+    showGateModal(name);
+    return;
+  }
+  showTab(name, el);
+}
+
+function showGateModal(name) {
+  var msgs = {
+    journal: 'The tasting journal is included when you get the book.',
+    quiz: 'The whisky quiz unlocks with the book.',
+    glossary: 'The full glossary unlocks with the book.',
+    advisor: 'The AI advisor is a premium feature. Upgrade to access unlimited recommendations.',
+  };
+  var links = {
+    journal: '/products/becoming-a-scotch-connoisseur',
+    quiz: '/products/becoming-a-scotch-connoisseur',
+    glossary: '/products/becoming-a-scotch-connoisseur',
+    advisor: '/pages/premium',
+  };
+  var existing = document.getElementById('gate-modal-overlay');
+  if (existing) existing.remove();
+  var overlay = document.createElement('div');
+  overlay.id = 'gate-modal-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px';
+  overlay.innerHTML = '<div style="background:#fff;border-radius:14px;padding:28px 24px;max-width:380px;width:100%;text-align:center">'
+    + '<div style="font-size:32px;margin-bottom:12px">🔒</div>'
+    + '<h3 style="margin-bottom:10px">Unlock this feature</h3>'
+    + '<p style="margin-bottom:20px;color:#555">' + msgs[name] + '</p>'
+    + '<a href="' + links[name] + '" class="btn" style="display:inline-block;margin-bottom:10px">Get the book →</a><br>'
+    + '<button onclick="document.getElementById(\'gate-modal-overlay\').remove()" style="font-size:13px;color:#aaa;background:none;border:none;cursor:pointer;margin-top:8px">Maybe later</button>'
+    + '</div>';
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
+}
+
+/* ── NAV ── */
+function showTab(t, el) {
+  document.querySelectorAll('.sec').forEach(function(s){ s.classList.remove('active'); });
+  document.querySelectorAll('.nb').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById('tab-' + t).classList.add('active');
+  if (el) el.classList.add('active');
+}
+
+/* ── LEARN ── */
+var completedSteps = {};
+var steps = [
+  {id:'s1',title:'What is whisky?',badge:'b-teal',bl:'Foundation',free:true,body:'Whisky (or whiskey) is a spirit distilled from fermented grain. Scotland, Japan, and Canada spell it "whisky." Ireland and the US use "whiskey." All whisky is made from grain, water, and yeast — then aged in oak barrels. The barrel is where most of the flavor comes from. New spirit is completely clear; the amber color you see in the bottle comes entirely from the wood.'},
+  {id:'s2',title:'Scotch basics',badge:'b-blue',bl:'Scotch',free:false,body:'Scotch must be made in Scotland, aged at least 3 years in oak casks, and bottled at minimum 40% ABV. The two most important styles are Single Malt (from one distillery, made with malted barley) and Blended Scotch (a mix of malts and grain whiskies). Blended Scotch — like Johnnie Walker or Dewar\'s — makes up about 90% of what\'s sold globally.'},
+  {id:'s3',title:'Understanding peat',badge:'b-blue',bl:'Scotch',free:false,body:'Peat is decomposed vegetation that Scots historically burned to dry malted barley. It infuses the grain — and ultimately the whisky — with smoke. Islay whiskies (Laphroaig, Ardbeg, Bowmore) are heavily peated and can taste like campfire, seaweed, or even bandages. Highland and Speyside whiskies are typically unpeated. Peat is the biggest polarizer in Scotch — people tend to love it or hate it.'},
+  {id:'s4',title:'Irish whiskey vs Scotch',badge:'b-amber',bl:'Irish',free:false,body:'Irish whiskey is typically triple-distilled (Scotch is usually double-distilled), making it notably smoother and lighter. It almost never uses peat. Redbreast 12 is widely considered one of the world\'s great whiskies. Jameson is the global best-seller. Irish whiskey is one of the fastest-growing spirits categories in the world right now.'},
+  {id:'s5',title:'Bourbon fundamentals',badge:'b-coral',bl:'Bourbon',free:false,body:'Bourbon must be made in the US, from a grain mix that\'s at least 51% corn, and aged in new charred oak barrels. The char creates a filter and imparts vanilla and caramel. Kentucky makes about 95% of the world\'s bourbon. Buffalo Trace, Wild Turkey 101, and Four Roses Yellow Label are excellent entry points.'},
+  {id:'s6',title:'How to taste whisky',badge:'b-purple',bl:'Tasting',free:false,body:'1) Nose — swirl gently, what do you smell? 2) Palate — small sip, let it coat your mouth. 3) Finish — what lingers after you swallow? Add a few drops of water to open up aromas. Trust your own impressions. There are no wrong answers, only your palate.'},
+];
+
+function buildSteps() {
+  var html = '';
+  steps.forEach(function(s, i) {
+    var done = completedSteps[s.id];
+    var locked = !s.free && TIER === 'free';
+    html += '<div class="card" style="cursor:pointer' + (locked ? ';opacity:0.6' : '') + '" onclick="' + (locked ? 'showGateModal(\'journal\')' : 'toggleStep(\'' + s.id + '\')') + '">';
+    html += '<div style="display:flex;gap:13px;align-items:flex-start">';
+    html += '<div class="snum' + (done ? ' done' : '') + '">' + (done ? '<i class="ti ti-check" style="font-size:13px"></i>' : (locked ? '🔒' : (i+1))) + '</div>';
+    html += '<div style="flex:1"><span class="badge ' + s.badge + '" style="margin-bottom:4px">' + s.bl + '</span><h3 style="margin-bottom:0">' + s.title + '</h3></div>';
+    if (!locked) html += '<i class="ti ti-chevron-down" id="chev-' + s.id + '" style="font-size:16px;color:#aaa;margin-top:4px"></i>';
+    html += '</div>';
+    if (!locked) {
+      html += '<div id="body-' + s.id + '" style="display:none;margin-top:13px;padding-top:13px;border-top:1px solid #f0ebe4">';
+      html += '<p>' + s.body + '</p>';
+      if (!done) html += '<button class="btn2" style="margin-top:13px" onclick="event.stopPropagation();markDone(\'' + s.id + '\')"><i class="ti ti-check"></i> Mark complete</button>';
+      html += '</div>';
+    }
+    html += '</div>';
+  });
+  document.getElementById('steps-list').innerHTML = html;
+  updateProg();
+}
+
+function toggleStep(id) {
+  var b = document.getElementById('body-' + id);
+  var c = document.getElementById('chev-' + id);
+  if (!b) return;
+  var open = b.style.display === 'block';
+  b.style.display = open ? 'none' : 'block';
+  if (c) c.style.transform = open ? '' : 'rotate(180deg)';
+}
+function markDone(id) { completedSteps[id] = true; buildSteps(); }
+function updateProg() {
+  var d = Object.keys(completedSteps).length;
+  var pct = Math.round((d / steps.length) * 100);
+  document.getElementById('pfill').style.width = pct + '%';
+  document.getElementById('prog-label').textContent = d + ' of ' + steps.length + ' complete';
+}
+
+/* ── REGIONS ── */
+var selRegion = null;
+var regions = [
+  {id:'speyside',name:'Speyside',badge:'b-blue',char:'Fruity & elegant',body:'Home to more distilleries than any other region. Smooth, fruity, and approachable. Notes of apple, pear, honey, and vanilla. The gentlest introduction to Scotch.',bottles:'Glenfiddich 12, Macallan 12, Glenlivet 12, Aberlour 12'},
+  {id:'highlands',name:'Highlands',badge:'b-teal',char:'Diverse & robust',body:'The largest region by geography, producing the most varied styles. Ranges from light and floral to rich and heathery to coastal and briny.',bottles:'Glenmorangie Original, Dalmore 12, Oban 14, Aberfeldy 12'},
+  {id:'islay',name:'Islay',badge:'b-coral',char:'Peaty & smoky',body:'A small island off the west coast, famous for intense peat smoke, iodine, and seaweed. A bold adventure for any whisky lover.',bottles:'Laphroaig 10, Ardbeg 10, Bowmore 12, Lagavulin 16'},
+  {id:'lowlands',name:'Lowlands',badge:'b-green',char:'Light & gentle',body:'The lightest style of Scotch — triple-distilled in some cases, similar to Irish whiskey. Grassy, floral, and delicate.',bottles:'Auchentoshan American Oak, Glenkinchie 12, Ailsa Bay'},
+  {id:'campbeltown',name:'Campbeltown',badge:'b-purple',char:'Briny & complex',body:'Once the whisky capital of the world. Salty, slightly peaty, often oily character. A cult favourite for serious enthusiasts.',bottles:'Springbank 10, Glen Scotia 15, Hazelburn 10'},
+];
+function buildRegions() {
+  var html = '';
+  regions.forEach(function(r) {
+    html += '<div class="rcard' + (selRegion===r.id?' sel':'') + '" onclick="showRegion(\'' + r.id + '\')" id="rc-' + r.id + '">';
+    html += '<span class="badge ' + r.badge + '" style="font-size:10px;margin-bottom:7px">' + r.char + '</span>';
+    html += '<div style="font-size:14px;font-weight:600;color:#1a1a1a">' + r.name + '</div></div>';
+  });
+  document.getElementById('region-grid').innerHTML = html;
+}
+function showRegion(id) {
+  selRegion = id;
+  var r = regions.find(function(x){ return x.id===id; });
+  document.querySelectorAll('.rcard').forEach(function(c){ c.classList.remove('sel'); });
+  document.getElementById('rc-'+id).classList.add('sel');
+  var d = document.getElementById('region-detail');
+  d.style.display = 'block';
+  d.innerHTML = '<h3 style="margin-bottom:7px">' + r.name + '</h3><p style="margin-bottom:12px">' + r.body + '</p>'
+    + '<div style="font-size:12px;color:#888;margin-bottom:4px">Where to start</div>'
+    + '<div style="font-size:13px;font-weight:500;color:#1a1a1a">' + r.bottles + '</div>';
+}
+
+/* ── FLAVOR FINDER ── */
+var selFlavors = [];
+var flavors = [
+  {id:'sweet',label:'Sweet & honeyed'},{id:'fruit',label:'Fruity & light'},
+  {id:'vanilla',label:'Vanilla & caramel'},{id:'smoke',label:'Smoky & peaty'},
+  {id:'spice',label:'Spicy & bold'},{id:'floral',label:'Floral & delicate'},
+  {id:'oak',label:'Oaky & rich'},{id:'citrus',label:'Citrus & zesty'},
+  {id:'sea',label:'Maritime & briny'},
+];
+var recoMap = {
+  sweet:['Glenfiddich 12 — honeyed and gentle','Glenmorangie Original — floral with honey','Auchentoshan American Oak — soft and malty'],
+  fruit:['Aberlour 12 — apple and pear forward','Macallan 12 Sherry Oak — dried fruit and orange','Green Spot — orchard fruit and spice'],
+  vanilla:['Buffalo Trace — classic vanilla and caramel','Maker\'s Mark — soft wheat and vanilla','Jameson — smooth with vanilla warmth'],
+  smoke:['Laphroaig 10 — the benchmark for peat','Ardbeg 10 — complex and intensely peaty','Bowmore 12 — peat balanced with fruit'],
+  spice:['Wild Turkey 101 — bold rye spice','Redbreast 12 — spice with sherry richness','Springbank 10 — earthy, oily, peppery'],
+  floral:['Glenkinchie 12 — light and floral','Auchentoshan American Oak — grassy and gentle','Glenmorangie Original — floral and peachy'],
+  oak:['Lagavulin 16 — deep, peaty, oak-forward','Dalmore 12 — chocolate and orange peel','Four Roses Single Barrel — deep oak and spice'],
+  citrus:['Glenlivet 12 — citrus and light spice','Teeling Small Batch — rum cask with citrus finish','Oban 14 — coastal with citrus and mild peat'],
+  sea:['Oban 14 — sea salt and heather','Springbank 10 — briny and coastal','Talisker 10 — pepper and sea spray'],
+};
+function buildFlavors() {
+  var html = '';
+  flavors.forEach(function(f) {
+    var s = selFlavors.indexOf(f.id) > -1;
+    html += '<button class="fbtn' + (s?' sel':'') + '" onclick="toggleFlavor(\'' + f.id + '\')">' + f.label + '</button>';
+  });
+  document.getElementById('flavor-grid').innerHTML = html;
+}
+function toggleFlavor(id) {
+  var i = selFlavors.indexOf(id);
+  if (i > -1) selFlavors.splice(i,1); else selFlavors.push(id);
+  buildFlavors();
+  document.getElementById('reco-results').innerHTML = '';
+  document.getElementById('flavor-gate').style.display = 'none';
+}
+var recoShown = false;
+function showRecos() {
+  if (!selFlavors.length) { alert('Pick at least one flavor first.'); return; }
+  var picks = {};
+  selFlavors.forEach(function(f){ (recoMap[f]||[]).forEach(function(b){ picks[b]=(picks[b]||0)+1; }); });
+  var sorted = Object.keys(picks).sort(function(a,b){ return picks[b]-picks[a]; }).slice(0,5);
+  // Show first 2 free, gate rest
+  var freeCount = TIER === 'free' ? 2 : sorted.length;
+  var html = '<h3 style="margin-bottom:12px">Suggested starting points</h3>';
+  sorted.slice(0, freeCount).forEach(function(b) {
+    var parts = b.split(' — ');
+    html += '<div class="rcrd"><div style="font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:3px">' + parts[0] + '</div><div style="font-size:12px;color:#888">' + (parts[1]||'') + '</div></div>';
+  });
+  document.getElementById('reco-results').innerHTML = html;
+  if (TIER === 'free' && sorted.length > 2) {
+    document.getElementById('flavor-gate').style.display = 'block';
+  }
+  recoShown = true;
+}
+var gateSubmitted = false;
+function submitGateEmail() {
+  var email = document.getElementById('gate-email').value.trim();
+  if (!email || !email.includes('@')) { alert('Please enter a valid email.'); return; }
+  // INTEGRATION: POST to your Klaviyo / email list here
+  // fetch('/apps/subscribe', { method:'POST', body: JSON.stringify({email, source:'flavor-finder'}) })
+  document.getElementById('flavor-gate').innerHTML = '<div class="gate"><span class="badge b-teal">Done!</span><h3>Check your inbox</h3><p>We\'ve sent your full recommendations plus the free beginner\'s guide to ' + email + '</p></div>';
+  gateSubmitted = true;
+}
+
+/* ── JOURNAL ── */
+var journalEntries = [], cRating = 0;
+function setRating(n) {
+  cRating = n;
+  ['r1','r2','r3','r4','r5'].forEach(function(id, i){ document.getElementById(id).style.color = i<n ? '#c4891f' : '#aaa'; });
+}
+function saveEntry() {
+  var name = document.getElementById('j-name').value.trim();
+  if (!name) { alert('Add a whisky name first.'); return; }
+  journalEntries.unshift({
+    name: name,
+    distillery: document.getElementById('j-distillery').value.trim(),
+    type: document.getElementById('j-type').value,
+    notes: document.getElementById('j-notes').value.trim(),
+    rating: cRating,
+    peat: document.getElementById('s-peat').value,
+    sweet: document.getElementById('s-sweet').value,
+    fruit: document.getElementById('s-fruit').value,
+    spice: document.getElementById('s-spice').value,
+    oak: document.getElementById('s-oak').value,
+    date: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})
+  });
+  document.getElementById('j-name').value='';document.getElementById('j-distillery').value='';
+  document.getElementById('j-type').value='';document.getElementById('j-notes').value='';
+  cRating=0;['r1','r2','r3','r4','r5'].forEach(function(id){document.getElementById(id).style.color='#aaa';});
+  ['peat','sweet','fruit','spice','oak'].forEach(function(k){
+    var def = k==='sweet'||k==='fruit'?5:k==='spice'||k==='oak'?3:0;
+    document.getElementById('s-'+k).value=def;document.getElementById('v-'+k).textContent=def;
+  });
+  renderJournal();
+}
+function renderJournal() {
+  var el = document.getElementById('journal-list');
+  var se = document.getElementById('journal-stats');
+  if (!journalEntries.length) {
+    el.innerHTML='<div class="empty"><i class="ti ti-notebook"></i>No tastings logged yet — add your first dram above.</div>';
+    se.style.display='none'; return;
+  }
+  var avg = journalEntries.reduce(function(a,e){return a+(e.rating||0);},0)/journalEntries.length;
+  var styles = journalEntries.filter(function(e){return e.type;}).reduce(function(acc,e){acc[e.type]=(acc[e.type]||0)+1;return acc;},{});
+  var top = Object.keys(styles).sort(function(a,b){return styles[b]-styles[a];})[0]||'—';
+  se.style.display='block';
+  se.innerHTML='<div class="stat-grid"><div class="stat"><div class="stat-n">'+journalEntries.length+'</div><div class="stat-l">tastings logged</div></div><div class="stat"><div class="stat-n">'+avg.toFixed(1)+'</div><div class="stat-l">avg rating</div></div><div class="stat"><div class="stat-n" style="font-size:13px;padding-top:5px">'+top.split(' — ')[0]+'</div><div class="stat-l">top style</div></div></div>';
+  var html='<div class="card">';
+  journalEntries.forEach(function(e){
+    html+='<div class="ne"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px"><div style="font-size:14px;font-weight:600;color:#1a1a1a">'+e.name+'</div><div class="stars">'+('★'.repeat(e.rating||0))+'</div></div>';
+    if(e.type) html+='<span class="tag">'+e.type+'</span>';
+    if(e.distillery) html+='<span class="tag">'+e.distillery+'</span>';
+    html+='<div style="font-size:11px;color:#aaa;margin:5px 0">Peat '+e.peat+' · Sweet '+e.sweet+' · Fruit '+e.fruit+' · Spice '+e.spice+' · Oak '+e.oak+'</div>';
+    if(e.notes) html+='<p style="font-size:13px;margin-top:5px">'+e.notes+'</p>';
+    html+='<div style="font-size:11px;color:#aaa;margin-top:5px">'+e.date+'</div></div>';
+  });
+  el.innerHTML = html + '</div>';
+}
+function exportJournal() {
+  if (!journalEntries.length) { alert('No tasting notes to export yet.'); return; }
+  var lines = ['LearnScotch — Tasting Journal','Generated: '+new Date().toLocaleDateString(),'Based on: Becoming a Scotch Connoisseur by Dan','','='.repeat(50),''];
+  journalEntries.forEach(function(e,i){
+    lines.push((i+1)+'. '+e.name+(e.distillery?' ('+e.distillery+')':''));
+    if(e.type) lines.push('Style: '+e.type);
+    lines.push('Rating: '+(e.rating?'★'.repeat(e.rating):'Unrated'));
+    lines.push('Date: '+e.date);
+    lines.push('Flavor: Peat '+e.peat+' | Sweet '+e.sweet+' | Fruit '+e.fruit+' | Spice '+e.spice+' | Oak '+e.oak);
+    if(e.notes) lines.push('Notes: '+e.notes);
+    lines.push('');
+  });
+  lines.push('—','learnscotch.com');
+  var blob=new Blob([lines.join('\n')],{type:'text/plain'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='learnscotch-journal.txt';a.click();
+}
+
+/* ── QUIZ ── */
+var quizPool=[],quizIdx=0,quizScore=0,quizMode='all',quizScores=[];
+var allQ=[
+  {q:'What does "Single Malt Scotch" mean?',opts:['Made from one grain at one distillery','Made by a single person','Malt barley from multiple distilleries','The most expensive category'],ans:0,cat:'scotch',exp:'Single Malt means produced at a single distillery using only malted barley.'},
+  {q:'Which Scottish region is famous for heavily peated whisky?',opts:['Speyside','Lowlands','Islay','Campbeltown'],ans:2,cat:'scotch',exp:'Islay is home to the peatiest Scotches in the world — Laphroaig, Ardbeg, Lagavulin.'},
+  {q:'How long must Scotch whisky be aged by law?',opts:['1 year','3 years','5 years','10 years'],ans:1,cat:'scotch',exp:'Scotch must be matured for a minimum of 3 years in oak casks in Scotland.'},
+  {q:'What grain must make up at least 51% of bourbon?',opts:['Rye','Wheat','Barley','Corn'],ans:3,cat:'bourbon',exp:'Bourbon must contain at least 51% corn — most distilleries use 60–80%.'},
+  {q:'Where must bourbon be made?',opts:['Kentucky only','The southern US','Anywhere in the United States','North America'],ans:2,cat:'bourbon',exp:'Bourbon can be made anywhere in the US, though about 95% is made in Kentucky.'},
+  {q:'What type of barrel must bourbon be aged in?',opts:['Used Scotch casks','New charred oak','New American white oak only','Any wooden barrel'],ans:1,cat:'bourbon',exp:'Bourbon must be aged in new charred oak containers — the source of its vanilla and caramel character.'},
+  {q:'How many times is Irish whiskey typically distilled?',opts:['Once','Twice','Three times','Four times'],ans:2,cat:'irish',exp:'Most Irish whiskey is triple-distilled, giving it a smoother, lighter character than Scotch.'},
+  {q:'Which of these is NOT a Speyside distillery?',opts:['Glenfiddich','Macallan','Laphroaig','Glenlivet'],ans:2,cat:'scotch',exp:'Laphroaig is on the Isle of Islay — it\'s one of the world\'s most famous peated whiskies.'},
+  {q:'What does ABV stand for?',opts:['Aged Barrel Volume','Alcohol by Volume','Amber Barrel Vintage','Age Before Vatting'],ans:1,cat:'general',exp:'ABV = Alcohol By Volume — the standard measure of alcohol strength in spirits.'},
+  {q:'Which is the world\'s best-selling Irish whiskey brand?',opts:['Redbreast','Bushmills','Jameson','Teeling'],ans:2,cat:'irish',exp:'Jameson is the world\'s best-selling Irish whiskey by a large margin.'},
+  {q:'What gives whisky its amber color?',opts:['Added caramel only','The grain used','Time in oak casks','The water source'],ans:2,cat:'general',exp:'Color comes from time in oak casks. New make spirit is clear. Wood contact creates the amber color.'},
+  {q:'Which flavor is most associated with Islay Scotch?',opts:['Vanilla','Peat and smoke','Apple and pear','Citrus'],ans:1,cat:'scotch',exp:'Islay is synonymous with intense peat smoke, iodine, and sometimes seaweed or medicinal notes.'},
+  {q:'What is a "dram"?',opts:['A type of Scottish barrel','An informal measure of whisky','A tasting note term','A Scottish festival'],ans:1,cat:'general',exp:'A dram simply means a measure of whisky — an informal, affectionate term used across Scotland.'},
+  {q:'Which bourbon is known for its high-rye mash bill?',opts:['Maker\'s Mark','Buffalo Trace','Four Roses','Wild Turkey 101'],ans:3,cat:'bourbon',exp:'Wild Turkey 101 uses a high-rye mash bill, giving it bold spice and a higher-than-average proof.'},
+  {q:'What region produces the lightest, most delicate Scotch?',opts:['Highlands','Campbeltown','Islay','Lowlands'],ans:3,cat:'scotch',exp:'The Lowlands produces light, grassy, floral whiskies — the most approachable style of Scotch.'},
+];
+function startQuiz(mode) {
+  quizMode=mode;
+  var pool=allQ.filter(function(q){return mode==='all'||(mode==='scotch'&&q.cat==='scotch')||(mode==='bourbon'&&(q.cat==='bourbon'||q.cat==='irish'))||q.cat==='general';});
+  quizPool=pool.sort(function(){return Math.random()-0.5;}).slice(0,10);
+  quizIdx=0;quizScore=0;
+  document.getElementById('quiz-home').style.display='none';
+  document.getElementById('quiz-active').style.display='block';
+  renderQ();
+}
+function renderQ() {
+  var el=document.getElementById('quiz-active');
+  if(quizIdx>=quizPool.length){
+    var pct=Math.round(quizScore/quizPool.length*100);
+    var grade=pct>=80?'Connoisseur':pct>=60?'Enthusiast':'Beginner';
+    quizScores.push({score:quizScore,total:quizPool.length,pct:pct,date:new Date().toLocaleDateString()});
+    el.innerHTML='<div class="card" style="text-align:center;padding:2rem 1.5rem">'
+      +'<div class="quiz-score-big">'+pct+'%</div>'
+      +'<div class="quiz-score-sub">'+quizScore+' of '+quizPool.length+' correct</div>'
+      +'<span class="badge b-purple">'+grade+'</span>'
+      +'<p style="margin:16px 0 0">'+getFeedback(pct)+'</p>'
+      +'<div class="btn-row" style="justify-content:center;margin-top:18px">'
+      +'<button class="btn" onclick="startQuiz(quizMode)">Try again</button>'
+      +'<button class="btn2" onclick="endQuiz()">Done</button></div></div>';
+    return;
+  }
+  var q=quizPool[quizIdx];
+  var html='<div style="font-size:12px;color:#aaa;margin-bottom:10px">Question '+(quizIdx+1)+' of '+quizPool.length+' · Score: '+quizScore+'</div>';
+  html+='<div class="pbar"><div class="pfill" style="width:'+Math.round(quizIdx/quizPool.length*100)+'%"></div></div>';
+  html+='<div class="card"><p style="font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:16px">'+q.q+'</p>';
+  q.opts.forEach(function(o,i){html+='<button class="qopt" id="qo'+i+'" onclick="answerQ('+i+')">'+o+'</button>';});
+  html+='</div>';
+  el.innerHTML=html;
+}
+function answerQ(i) {
+  var q=quizPool[quizIdx];
+  document.querySelectorAll('.qopt').forEach(function(b){b.onclick=null;});
+  document.getElementById('qo'+i).classList.add(i===q.ans?'correct':'wrong');
+  if(i!==q.ans) document.getElementById('qo'+q.ans).classList.add('correct');
+  if(i===q.ans) quizScore++;
+  var exp=document.createElement('div');
+  exp.style.cssText='font-size:13px;padding:11px 15px;background:#f9f7f4;border-radius:8px;margin-top:8px;color:#555;line-height:1.55';
+  exp.textContent=q.exp;
+  document.getElementById('quiz-active').appendChild(exp);
+  var nb=document.createElement('button');nb.className='btn';nb.style.marginTop='12px';
+  nb.textContent=quizIdx+1<quizPool.length?'Next question →':'See my results →';
+  nb.onclick=function(){quizIdx++;renderQ();};
+  document.getElementById('quiz-active').appendChild(nb);
+}
+function endQuiz(){document.getElementById('quiz-home').style.display='block';document.getElementById('quiz-active').style.display='none';renderQuizHistory();}
+function getFeedback(pct){
+  if(pct>=90)return'Outstanding — you clearly know your drams. Dan would be impressed.';
+  if(pct>=70)return'Solid knowledge. Keep exploring and you\'ll be advising others soon.';
+  if(pct>=50)return'Good start. A few more drams and lessons and you\'ll level up fast.';
+  return'Don\'t worry — this is what the Learn section is for. Head back and work through the lessons.';
+}
+function renderQuizHistory(){
+  if(!quizScores.length){document.getElementById('quiz-history').innerHTML='';return;}
+  var html='<div class="card" style="margin-top:14px"><div style="font-size:13px;font-weight:600;margin-bottom:10px;color:#1a1a1a">Recent scores</div>';
+  quizScores.slice(-5).reverse().forEach(function(s){html+='<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f0ebe4;font-size:13px"><span style="color:#888">'+s.date+'</span><span style="font-weight:600;color:#8B5E3C">'+s.score+'/'+s.total+' ('+s.pct+'%)</span></div>';});
+  document.getElementById('quiz-history').innerHTML=html+'</div>';
+}
+
+/* ── AI ADVISOR ── */
+var chatHistory=[];
+var chatCount=0;
+var FREE_CHAT_LIMIT=3;
+function prefill(txt){document.getElementById('chat-in').value=txt;document.getElementById('chat-in').focus();}
+function sendChat(){
+  var inp=document.getElementById('chat-in');
+  var msg=inp.value.trim();if(!msg)return;
+  if(TIER==='free'&&chatCount>=FREE_CHAT_LIMIT){
+    showGateModal('advisor');return;
+  }
+  inp.value='';chatCount++;
+  var el=document.getElementById('chat-msgs');
+  el.innerHTML+='<div class="chat-msg chat-user"><div class="bubble u">'+msg+'</div></div>';
+  el.innerHTML+='<div class="chat-msg" id="typing"><div class="bubble a" style="color:#aaa">Thinking...</div></div>';
+  chatHistory.push({role:'user',content:msg});
+  if(TIER==='free'){
+    var rem=FREE_CHAT_LIMIT-chatCount;
+    document.getElementById('advisor-limit-msg').textContent=rem>0?rem+' free question'+(rem!==1?'s':'')+' remaining':'Free questions used — get the book for unlimited access';
+  }
+  fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-6',
+      max_tokens:1000,
+      system:'You are a friendly, expert whisky advisor for LearnScotch.com — a beginner-friendly Scotch whisky education brand. The site is built around the book "Becoming a Scotch Connoisseur" by Dan. Your tone is warm, conversational, approachable, and completely free of snobbery. Give practical, specific bottle recommendations the user can actually find. Cover Scotch, Irish whiskey, and bourbon equally well. Keep replies to 3–5 sentences unless depth is genuinely needed. Occasionally and naturally mention the book when relevant ("Dan covers this in the book" etc) — but don\'t force it.',
+      messages:chatHistory
+    })
+  }).then(function(r){return r.json();})
+  .then(function(d){
+    var reply=(d.content&&d.content[0]&&d.content[0].text)||'Sorry, I couldn\'t get a response. Please try again.';
+    chatHistory.push({role:'assistant',content:reply});
+    document.getElementById('typing').outerHTML='<div class="chat-msg"><div class="bubble a">'+reply+'</div></div>';
+    var msgs=document.getElementById('chat-msgs');
+    msgs.scrollTop=msgs.scrollHeight;
+  }).catch(function(){
+    document.getElementById('typing').outerHTML='<div class="chat-msg"><div class="bubble a" style="color:#c0392b">Connection error. Please try again.</div></div>';
+  });
+}
+
+/* ── GLOSSARY ── */
+var glossCat='all';
+var glossaryTerms=[
+  {term:'ABV',cat:'basics',def:'Alcohol By Volume — the percentage of a liquid that is pure alcohol. Most whisky is bottled between 40% and 65% ABV.'},
+  {term:'Age statement',cat:'basics',def:'The number on a bottle indicating the youngest whisky in that expression. A 12-year Scotch spent at least 12 years in cask.'},
+  {term:'Angel\'s share',cat:'production',def:'The whisky that evaporates from the cask during maturation. In Scotland, roughly 2% per year is lost. Over decades, this is significant.'},
+  {term:'Blended Scotch',cat:'scotch',def:'A whisky combining malt whiskies (pot still) and grain whiskies (column still). Johnnie Walker and Dewar\'s are blends. Makes up ~90% of Scotch sold.'},
+  {term:'Bottled in bond',cat:'bourbon',def:'An American whisky at least 4 years old, bottled at exactly 100 proof (50% ABV), from one distillery in a single distillation season.'},
+  {term:'Cask strength',cat:'basics',def:'Whisky bottled at its natural strength from the cask, without dilution. Often 55–65% ABV. Add water to your preference.'},
+  {term:'Column still',cat:'production',def:'A continuous distillation apparatus producing lighter, higher-proof spirit. Used for grain whisky in blends and most bourbon production.'},
+  {term:'Dram',cat:'basics',def:'An informal word for a measure of whisky. Has no fixed quantity — simply means a pour of whisky to enjoy.'},
+  {term:'Expression',cat:'basics',def:'A specific version of a whisky — e.g. the 12-year, the 18-year, or a sherry cask finish variant from the same distillery.'},
+  {term:'Finish',cat:'tasting',def:'What you taste after swallowing the whisky. A long finish lingers pleasantly; a short finish fades quickly. Often differs from the palate.'},
+  {term:'Heart',cat:'production',def:'The middle cut of a distillation run — the desirable portion that becomes whisky. The distiller\'s skill lies in making accurate cuts.'},
+  {term:'High-rye',cat:'bourbon',def:'A bourbon with a higher-than-average proportion of rye in its grain mix, creating a spicier character. Wild Turkey and Bulleit are examples.'},
+  {term:'Islay',cat:'scotch',def:'A Scottish island and whisky region famous for intensely peated, smoky whiskies. Home to Laphroaig, Ardbeg, Bowmore, and Lagavulin.'},
+  {term:'Mash bill',cat:'bourbon',def:'The grain recipe used in a whisky. Bourbon must be at least 51% corn; the rest is typically rye or wheat plus malted barley.'},
+  {term:'Maturation',cat:'production',def:'The period during which new make spirit rests in oak casks, developing color, flavor, and complexity. The cask does the heavy lifting.'},
+  {term:'NAS',cat:'basics',def:'No Age Statement — a whisky bottled without declaring its age. May contain whisky of varying ages. Not necessarily inferior to aged expressions.'},
+  {term:'New make spirit',cat:'production',def:'The clear, raw spirit that comes off the still before maturation. High-proof and pungent — quite different from the finished whisky.'},
+  {term:'Nose',cat:'tasting',def:'The aroma of a whisky. "To nose" means to smell it carefully, ideally in a tulip-shaped glass. Often the most revealing aspect.'},
+  {term:'Palate',cat:'tasting',def:'The flavors you experience while the whisky is in your mouth. Follows the nose, precedes the finish.'},
+  {term:'Peat',cat:'scotch',def:'Decomposed vegetation found in Scottish bogs. When burned to dry malted barley, it imparts smoky, medicinal, and earthy flavors.'},
+  {term:'Pot still',cat:'production',def:'Traditional copper vessel used for batch distillation. Creates heavier, more complex spirit than a column still. Used for all single malt Scotch.'},
+  {term:'Proof',cat:'bourbon',def:'An American measure of alcohol. Proof = 2× ABV. So 100 proof = 50% ABV. Bourbon must be distilled to no more than 160 proof.'},
+  {term:'Single malt',cat:'scotch',def:'Scotch produced at a single distillery using only malted barley. The most prestigious and celebrated category of Scotch.'},
+  {term:'Speyside',cat:'scotch',def:'A Scottish whisky region along the River Spey with more distilleries than anywhere else. Known for smooth, fruity, approachable whiskies.'},
+  {term:'Uisge beatha',cat:'basics',def:'Gaelic for "water of life" — the origin of the word "whisky." Pronounced roughly "oosh-ka beh-ha."'},
+  {term:'Wash',cat:'production',def:'The fermented liquid produced before distillation — similar to beer at 6–10% ABV. Made from malted barley, water, and yeast.'},
+  {term:'Wheat whiskey',cat:'bourbon',def:'A bourbon where wheat replaces rye as the secondary grain, creating a softer, sweeter profile. Maker\'s Mark is the classic example.'},
+];
+var glossFiltered = glossaryTerms;
+function buildGlossCats(){
+  var cats=['all','basics','scotch','bourbon','production','tasting'];
+  var labels={all:'All',basics:'Basics',scotch:'Scotch',bourbon:'Bourbon',production:'Production',tasting:'Tasting'};
+  var html='';
+  cats.forEach(function(c){html+='<button class="cpill'+(glossCat===c?' active':'')+'" onclick="setGlossCat(\''+c+'\')">'+labels[c]+'</button>';});
+  document.getElementById('gloss-cats').innerHTML=html;
+}
+function setGlossCat(c){glossCat=c;filterGloss();}
+function filterGloss(){
+  var q=document.getElementById('gloss-search').value.toLowerCase();
+  glossFiltered=glossaryTerms.filter(function(t){return(glossCat==='all'||t.cat===glossCat)&&(!q||t.term.toLowerCase().includes(q)||t.def.toLowerCase().includes(q));});
+  buildGlossCats();renderGloss();
+}
+function renderGloss(){
+  if(!glossFiltered.length){document.getElementById('gloss-list').innerHTML='<div class="empty">No matching terms</div>';return;}
+  var html='';
+  glossFiltered.forEach(function(t){
+    html+='<div class="gterm"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:14px;font-weight:600;color:#1a1a1a">'+t.term+'</span><span class="tag">'+t.cat+'</span></div><p style="font-size:13px;margin-top:5px">'+t.def+'</p></div>';
+  });
+  document.getElementById('gloss-list').innerHTML=html;
+}
+
+/* ── INIT ── */
+detectTier();
+buildSteps();
+buildRegions();
+buildFlavors();
+renderJournal();
+buildGlossCats();
+renderGloss();
+renderQuizHistory();
+</script>
+</body>
+</html>
