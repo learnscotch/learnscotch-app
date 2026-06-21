@@ -313,7 +313,7 @@
   <div id="tab-advisor" class="sec">
     <div class="upsell-strip" id="advisor-upsell" style="display:none">
       <p>Unlock unlimited AI recommendations — get the book.</p>
-      <a href="/products/becoming-a-scotch-connoisseur" class="btn">Get the book →</a>
+      <a href="https://www.amazon.com/dp/B0GPXP463F" target="_blank" rel="noopener" class="btn">Get the book →</a>
     </div>
     <div class="card" style="margin-bottom:12px">
       <span class="badge b-purple">AI-powered</span>
@@ -354,7 +354,7 @@
 
   <footer class="app-footer">
     <p>Built by <a href="https://learnscotch.com">LearnScotch.com</a> · Based on <em>Becoming a Scotch Connoisseur</em> by Dan</p>
-    <p style="margin-top:6px"><a href="/products/becoming-a-scotch-connoisseur">Get the book →</a> · <a href="/pages/about">About</a></p>
+    <p style="margin-top:6px"><a href="https://www.amazon.com/dp/B0GPXP463F" target="_blank" rel="noopener">Get the book →</a> · <a href="https://www.amazon.com/dp/B0GPXP463F" target="_blank" rel="noopener">About</a></p>
   </footer>
 
 </div><!-- /app-shell -->
@@ -368,7 +368,7 @@
    C) Klaviyo property: check via your backend
    D) localStorage flag set by your post-purchase redirect
 ──────────────────────────────────────────────────────────────── */
-var TIER = 'free'; // 'free' | 'book' | 'premium'
+var TIER = 'premium'; // 'free' | 'book' | 'premium' — set to 'premium' to unlock everything while you decide on monetization
 
 function detectTier() {
   var params = new URLSearchParams(window.location.search);
@@ -427,10 +427,10 @@ function showGateModal(name) {
     advisor: 'The AI advisor is a premium feature. Upgrade to access unlimited recommendations.',
   };
   var links = {
-    journal: '/products/becoming-a-scotch-connoisseur',
-    quiz: '/products/becoming-a-scotch-connoisseur',
-    glossary: '/products/becoming-a-scotch-connoisseur',
-    advisor: '/pages/premium',
+    journal: 'https://www.amazon.com/dp/B0GPXP463F',
+    quiz: 'https://www.amazon.com/dp/B0GPXP463F',
+    glossary: 'https://www.amazon.com/dp/B0GPXP463F',
+    advisor: 'https://www.amazon.com/dp/B0GPXP463F',
   };
   var existing = document.getElementById('gate-modal-overlay');
   if (existing) existing.remove();
