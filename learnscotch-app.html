@@ -353,7 +353,7 @@
   </div>
 
   <footer class="app-footer">
-    <p>Built by <a href="https://learnscotch.com">LearnScotch.com</a> · Based on <em>Becoming a Scotch Connoisseur</em> by Dan</p>
+    <p>Built by <a href="https://learnscotch.com">LearnScotch.com</a> · Based on <em>Becoming a Scotch Connoisseur</em> by Dan Cannon</p>
     <p style="margin-top:6px"><a href="https://www.amazon.com/dp/B0GPXP463F" target="_blank" rel="noopener">Get the book →</a> · <a href="https://www.amazon.com/dp/B0GPXP463F" target="_blank" rel="noopener">About</a></p>
   </footer>
 
@@ -656,7 +656,7 @@ function renderJournal() {
 }
 function exportJournal() {
   if (!journalEntries.length) { alert('No tasting notes to export yet.'); return; }
-  var lines = ['LearnScotch — Tasting Journal','Generated: '+new Date().toLocaleDateString(),'Based on: Becoming a Scotch Connoisseur by Dan','','='.repeat(50),''];
+  var lines = ['LearnScotch — Tasting Journal','Generated: '+new Date().toLocaleDateString(),'Based on: Becoming a Scotch Connoisseur by Dan Cannon','','='.repeat(50),''];
   journalEntries.forEach(function(e,i){
     lines.push((i+1)+'. '+e.name+(e.distillery?' ('+e.distillery+')':''));
     if(e.type) lines.push('Style: '+e.type);
@@ -778,7 +778,7 @@ function sendChat(){
     body:JSON.stringify({
       model:'claude-sonnet-4-6',
       max_tokens:1000,
-      system:'You are a friendly, expert whisky advisor for LearnScotch.com — a beginner-friendly Scotch whisky education brand. The site is built around the book "Becoming a Scotch Connoisseur" by Dan. Your tone is warm, conversational, approachable, and completely free of snobbery. Give practical, specific bottle recommendations the user can actually find. Cover Scotch, Irish whiskey, and bourbon equally well. Keep replies to 3–5 sentences unless depth is genuinely needed. Occasionally and naturally mention the book when relevant ("Dan covers this in the book" etc) — but don\'t force it.',
+      system:'You are a friendly, expert whisky advisor for LearnScotch.com — a beginner-friendly Scotch whisky education brand. The site is built around the book "Becoming a Scotch Connoisseur" by Dan Cannon. Your tone is warm, conversational, approachable, and completely free of snobbery. Give practical, specific bottle recommendations the user can actually find. Cover Scotch, Irish whiskey, and bourbon equally well. Keep replies to 3–5 sentences unless depth is genuinely needed. Occasionally and naturally mention the book when relevant ("Dan Cannon covers this in the book" etc) — but don\'t force it. IMPORTANT: Never use Markdown formatting — no asterisks for bold or italic, no bullet points, no headers. Write in plain conversational prose only, as if texting a knowledgeable friend.',
       messages:chatHistory
     })
   }).then(function(r){return r.json();})
